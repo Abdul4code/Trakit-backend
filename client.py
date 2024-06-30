@@ -1,7 +1,47 @@
 import requests
 
-header = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE4ODk5NDcwLCJpYXQiOjE3MTgyOTQ2NzAsImp0aSI6Ijc0ZjdkY2ZlNjczYTRhY2M5ODY2MjY0MjAxMTJlZjJlIiwidXNlcl9pZCI6Mn0.14_SmywsQD_M0PTiUQEZI0cYBt1xXLmVM3nDJH2SVh4'}
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-hello = requests.get('http://127.0.0.1:8000/users/protected/', headers=header)
+def send_email():
+    sender_email = 'abuabdul4peace@gmail.com'
+    receiver_email = 'nightingale9ja@gmail.com'  # Replace with recipient's email address
+    password = 'solidStreams5050'
 
-print(hello.content)
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Test Email"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    text = """\
+    Hi,
+    This is a test email from Python."""
+    html = """\
+    <html>
+      <body>
+        <p>Hi,<br>
+           This is a test email from <b>Python</b>.<br>
+        </p>
+      </body>
+    </html>
+    """
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 465)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email. Error: {str(e)}")
+
+
+send_email()
+

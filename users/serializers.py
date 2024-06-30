@@ -1,23 +1,29 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only = True)
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['username', 'email', 'password', 'first_name', 'last_name', 'confirm_password']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("Password and Confirm password do not match")
-        return data
+    
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError({"email": "This email already exists"})
+
+        return data 
     
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        user = User.objects.create_user(
+        user = get_user_model().objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
@@ -46,5 +52,15 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError('Invalid Credentials')
         else:
             raise serializers.ValidationError('Username and password must be provided')
+        
+        return data
+    
+
+class recoverEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate(self, data):
+        if not get_user_model().objects.filter(email = data['email']).exists():
+            raise serializers.ValidationError({'email': "There is no user registered with this email address"})
         
         return data
