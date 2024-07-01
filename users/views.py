@@ -65,7 +65,7 @@ def passwordResetRequest(request, *args, **kwargs):
     user = get_user_model().objects.get(email=email)
     token = default_token_generator.make_token(user)
     uuid = urlsafe_base64_encode(force_bytes(user.pk))
-    url = '{}/{}/{}'.format(config('FRONT_END_BASE_URL'), uuid, token)
+    url = '{}/reset/{}/{}'.format(config('FRONT_END_BASE_URL'), uuid, token)
 
     message = Mail(
     from_email='abdulkadir.abubakar@vnicomhub.com',
@@ -80,7 +80,7 @@ def passwordResetRequest(request, *args, **kwargs):
                         <p style="font-size:12pt; text-align: center; margin-top: 40px"> 
                             <a style="padding:10px; background-color: rgba(74, 147, 76, 0.8); color: white; text-decoration: none; border-radius: 10px" href='{}'>  Create a new password </a> 
                         </p>
-                        <p style="font-size: 10pt; text-align: center; margin-top: 40px"> This link doest work? Copy and past the following link in your browser address bar:
+                        <p style="font-size: 10pt; text-align: center; margin-top: 40px"> The button doest work? Copy and past the following link in your browser address bar:
                         <p style="font-size: 10pt; text-align: center; margin-top: 30px"><a href='{}'> {} </a> <p>
                     </p>'''.format(url, url, url)
     )
